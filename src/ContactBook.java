@@ -1,26 +1,30 @@
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.util.Collections;
+import java.util.List;
 
 
 /**
  * Created by Murager on 3/1/17.
  */
 public class ContactBook extends Application
-        implements CreateContactDialog.OnContactCreate, UpdateContactDialog.OnContactUpdated {
+        implements CreateContactDialog.OnContactCreate,
+        UpdateContactDialog.OnContactUpdated, ChangeListener<String> {
 
     //Okno
     Stage window;
@@ -43,6 +47,15 @@ public class ContactBook extends Application
     ObservableList<String> stringList = FXCollections.observableArrayList(
             "qwerty", "qwerty1", "qwerty2", "qwerty3"
     );
+
+
+    ObservableList<Contact> contactList = FXCollections.observableArrayList(
+            new Contact("Bob"), new Contact("Alex"), new Contact("Mike")
+    );
+
+
+
+    ObservableList<String> filterList = FXCollections.observableArrayList();
 
     Label label;
 
@@ -68,7 +81,34 @@ public class ContactBook extends Application
         buttonGoodbye.setOnAction(e -> label.setText("Goodbye"));
 
 
-        listView = new ListView(stringList);
+        TextField searchFiled = new TextField();
+        searchFiled.setPromptText("Search");
+
+        searchFiled.textProperty().addListener(this);
+
+        listView = new ListView(contactList);
+
+        listView.setCellFactory(new Callback<ListView<Contact>, ListCell<Contact>>() {
+
+            @Override
+            public ListCell<Contact> call(ListView<Contact> param) {
+
+                ListCell<Contact> cell = new ListCell<Contact>(){
+                    @Override
+                    protected void updateItem(Contact item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getId() + " ------ " + item.getName());
+                        }
+                    }
+                };
+
+
+
+                return cell;
+            }
+        });
+
         //listView.setItems(stringList);
 
 
@@ -117,7 +157,17 @@ public class ContactBook extends Application
         buttonFindContact = new Button();
         buttonFindContact.setText("Naiti");
         buttonFindContact.setOnAction(e-> {
-
+            filterList.clear();
+            String searchedString = searchFiled.getText();
+            if (searchedString != null || searchedString.length() > 0) {
+                for (String s : stringList) {
+                    if (s.toLowerCase().contains(searchedString.toLowerCase())) {
+                        filterList.add(s);
+                        System.out.println("Finded words:  " + s);
+                    }
+                }
+                listView.setItems(filterList);
+            }
         });
 
         buttonSortContactBy = new Button();
@@ -130,9 +180,12 @@ public class ContactBook extends Application
         leftMenu.getChildren().addAll(buttonCreate, buttonUpdate, buttonDelete,
                 buttonFindContact, buttonSortContactBy);
 
+        VBox rightMenu = new VBox(4);
+        rightMenu.getChildren().addAll(searchFiled, listView);
+
 
         HBox holder = new HBox(16);
-        holder.getChildren().addAll(leftMenu, listView);
+        holder.getChildren().addAll(leftMenu, rightMenu);
 
 
         //listView.setItems(stringList);
@@ -152,18 +205,42 @@ public class ContactBook extends Application
 
 
 
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void contactCreated(String data) {
-        stringList.add(data);
+    public void contactCreated(Contact data) {
+//        stringList.add(data);
+//        filterList = stringList;
+        contactList.add(data);
     }
 
     @Override
     public void updateContact(int position, String data) {
         stringList.set(position, data);
+        filterList = stringList;
+    }
+
+    ObservableList<String> tempList = stringList;
+
+    @Override
+    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        if (newValue == null || newValue.length() < 1) {
+            filterList.clear();
+            listView.setItems(stringList);
+        }
+        else {
+            filterList.clear();
+            for (String s : stringList) {
+                if (s.toLowerCase().contains(newValue.toLowerCase())) {
+                    filterList.add(s);
+                    System.out.println("Finded words:  " + s);
+                }
+            }
+            listView.setItems(filterList);
+        }
     }
 
 

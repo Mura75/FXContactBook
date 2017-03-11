@@ -30,7 +30,10 @@ public class CreateContactDialog {
         Button buttonCreate = new Button();
         buttonCreate.setText("Create");
         buttonCreate.setOnAction(e -> {
-            listener.contactCreated(tfName.getText());
+            Contact contact = new Contact();
+            contact.setName(tfName.getText());
+
+            listener.contactCreated(contact);
             window.close();
         });
 
@@ -44,6 +47,6 @@ public class CreateContactDialog {
 
     public interface OnContactCreate {
 
-        void contactCreated(String data);
+        void contactCreated(Contact data);
     }
 }
