@@ -25,6 +25,8 @@ public class CreateContactDialog {
         TextField tfPhone = new TextField();
         TextField tfEmail = new TextField();
 
+        tfName.setPromptText("Name");
+
         Button buttonCreate = new Button();
         buttonCreate.setText("Create");
         buttonCreate.setOnAction(e -> {

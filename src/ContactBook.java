@@ -13,12 +13,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.Collections;
 
 
 /**
  * Created by Murager on 3/1/17.
  */
-public class ContactBook extends Application implements CreateContactDialog.OnContactCreate {
+public class ContactBook extends Application
+        implements CreateContactDialog.OnContactCreate, UpdateContactDialog.OnContactUpdated {
 
     //Okno
     Stage window;
@@ -84,6 +86,15 @@ public class ContactBook extends Application implements CreateContactDialog.OnCo
         buttonUpdate = new Button();
         buttonUpdate.setText("Obnovit");
         buttonUpdate.setOnAction(e -> {
+            int updatePos = listView.getSelectionModel().getSelectedIndex();
+
+            if (updatePos >= 0) {
+                String name = stringList.get(updatePos);
+                UpdateContactDialog.display(ContactBook.this, updatePos, name);
+            }
+            else {
+                NotificationMessage.display("You should select name to update!");
+            }
 
         });
 
@@ -112,7 +123,7 @@ public class ContactBook extends Application implements CreateContactDialog.OnCo
         buttonSortContactBy = new Button();
         buttonSortContactBy.setText("Sortiroviat po");
         buttonSortContactBy.setOnAction(e -> {
-
+            Collections.sort(stringList);
         });
 
         VBox leftMenu = new VBox(8);
@@ -148,6 +159,11 @@ public class ContactBook extends Application implements CreateContactDialog.OnCo
     @Override
     public void contactCreated(String data) {
         stringList.add(data);
+    }
+
+    @Override
+    public void updateContact(int position, String data) {
+        stringList.set(position, data);
     }
 
 
