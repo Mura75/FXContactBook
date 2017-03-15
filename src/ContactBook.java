@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
@@ -44,9 +45,9 @@ public class ContactBook extends Application
     //Spisok
     ListView listView;
 
-    ObservableList<String> stringList = FXCollections.observableArrayList(
-            "qwerty", "qwerty1", "qwerty2", "qwerty3"
-    );
+//    ObservableList<String> stringList = FXCollections.observableArrayList(
+//            "qwerty", "qwerty1", "qwerty2", "qwerty3"
+//    );
 
 
     ObservableList<Contact> contactList = FXCollections.observableArrayList(
@@ -55,7 +56,7 @@ public class ContactBook extends Application
 
 
 
-    ObservableList<String> filterList = FXCollections.observableArrayList();
+    //ObservableList<String> filterList = FXCollections.observableArrayList();
 
     Label label;
 
@@ -100,16 +101,17 @@ public class ContactBook extends Application
                         if (item != null) {
                             setText(item.getId() + " ------ " + item.getName());
                         }
+                        else {
+                            setText(null);
+                        }
                     }
                 };
-
-
 
                 return cell;
             }
         });
 
-        //listView.setItems(stringList);
+        listView.setItems(contactList);
 
 
         buttonCreate = new Button();
@@ -129,8 +131,8 @@ public class ContactBook extends Application
             int updatePos = listView.getSelectionModel().getSelectedIndex();
 
             if (updatePos >= 0) {
-                String name = stringList.get(updatePos);
-                UpdateContactDialog.display(ContactBook.this, updatePos, name);
+                Contact contact = contactList.get(updatePos);
+                UpdateContactDialog.display(ContactBook.this, updatePos, contact);
             }
             else {
                 NotificationMessage.display("You should select name to update!");
@@ -146,10 +148,14 @@ public class ContactBook extends Application
                     .getSelectedIndex();
 
             if (itemPosition >= 0) {
-                stringList.remove(itemPosition);
+                contactList.remove(itemPosition);
+                System.out.println(contactList.toString());
+                listView.setItems(null);
+                listView.setItems(contactList);
+                System.out.println("items: " + listView.getItems().size());
             }
             else {
-                NotificationMessage.display("You should select name");
+                NotificationMessage.display("You should select contact");
             }
 
         });
@@ -157,23 +163,23 @@ public class ContactBook extends Application
         buttonFindContact = new Button();
         buttonFindContact.setText("Naiti");
         buttonFindContact.setOnAction(e-> {
-            filterList.clear();
-            String searchedString = searchFiled.getText();
-            if (searchedString != null || searchedString.length() > 0) {
-                for (String s : stringList) {
-                    if (s.toLowerCase().contains(searchedString.toLowerCase())) {
-                        filterList.add(s);
-                        System.out.println("Finded words:  " + s);
-                    }
-                }
-                listView.setItems(filterList);
-            }
+            //filterList.clear();
+//            String searchedString = searchFiled.getText();
+//            if (searchedString != null || searchedString.length() > 0) {
+//                for (String s : stringList) {
+//                    if (s.toLowerCase().contains(searchedString.toLowerCase())) {
+//                        filterList.add(s);
+//                        System.out.println("Finded words:  " + s);
+//                    }
+//                }
+//                listView.setItems(filterList);
+//            }
         });
 
         buttonSortContactBy = new Button();
         buttonSortContactBy.setText("Sortiroviat po");
         buttonSortContactBy.setOnAction(e -> {
-            Collections.sort(stringList);
+            Collections.sort(contactList);
         });
 
         VBox leftMenu = new VBox(8);
@@ -218,29 +224,29 @@ public class ContactBook extends Application
     }
 
     @Override
-    public void updateContact(int position, String data) {
-        stringList.set(position, data);
-        filterList = stringList;
+    public void updateContact(int position, Contact data) {
+        contactList.set(position, data);
+        //filterList = stringList;
     }
 
-    ObservableList<String> tempList = stringList;
+    //ObservableList<String> tempList = stringList;
 
     @Override
     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        if (newValue == null || newValue.length() < 1) {
-            filterList.clear();
-            listView.setItems(stringList);
-        }
-        else {
-            filterList.clear();
-            for (String s : stringList) {
-                if (s.toLowerCase().contains(newValue.toLowerCase())) {
-                    filterList.add(s);
-                    System.out.println("Finded words:  " + s);
-                }
-            }
-            listView.setItems(filterList);
-        }
+//        if (newValue == null || newValue.length() < 1) {
+//            filterList.clear();
+//            listView.setItems(stringList);
+//        }
+//        else {
+//            filterList.clear();
+//            for (String s : stringList) {
+//                if (s.toLowerCase().contains(newValue.toLowerCase())) {
+//                    filterList.add(s);
+//                    System.out.println("Finded words:  " + s);
+//                }
+//            }
+//            listView.setItems(filterList);
+//        }
     }
 
 

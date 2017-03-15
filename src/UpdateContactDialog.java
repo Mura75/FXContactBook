@@ -11,7 +11,7 @@ public class UpdateContactDialog {
 
 
     public static void display(OnContactUpdated listener,
-                               int position, String name) {
+                               int position, Contact contact) {
 
         Stage window = new Stage();
         window.setTitle("Update contact");
@@ -30,12 +30,19 @@ public class UpdateContactDialog {
         tfPhone.setPromptText("Phone");
         tfEmail.setPromptText("Email");
 
-        tfName.setText(name);
+        tfName.setText(contact.getName());
+        tfSurname.setText(contact.getSurname());
+        tfPhone.setText(contact.getPhone());
+        tfEmail.setText(contact.getEmail());
 
         Button buttonUpdate = new Button();
         buttonUpdate.setText("Update");
         buttonUpdate.setOnAction(e -> {
-            listener.updateContact(position, tfName.getText());
+            contact.setName(tfName.getText());
+            contact.setSurname(tfSurname.getText());
+            contact.setEmail(tfEmail.getText());
+            contact.setPhone(tfPhone.getText());
+            listener.updateContact(position, contact);
             window.close();
         });
 
@@ -51,6 +58,6 @@ public class UpdateContactDialog {
 
     public interface OnContactUpdated {
 
-        void updateContact(int position, String data);
+        void updateContact(int position, Contact data);
     }
 }
